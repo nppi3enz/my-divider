@@ -1,16 +1,17 @@
 {
   "name": "my-divider",
   "version": "1.0.0",
-  "description": "",
+  "description": "my case study for line bot",
   "main": "index.js",
   "scripts": {
+    "start": "node index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/nppi3enz/my-divider.git"
   },
-  "author": "nppi3enz",
+  "author": "Nipitpon Chantada",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/nppi3enz/my-divider/issues"
