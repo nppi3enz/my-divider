@@ -1,0 +1,23 @@
+{
+  "name": "my-divider",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nppi3enz/my-divider.git"
+  },
+  "author": "nppi3enz",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/nppi3enz/my-divider/issues"
+  },
+  "homepage": "https://github.com/nppi3enz/my-divider#readme",
+  "dependencies": {
+    "@line/bot-sdk": "^6.6.0",
+    "express": "^4.16.4"
+  }
+}
