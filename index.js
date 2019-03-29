@@ -1,12 +1,10 @@
 'use strict';
 
+const config = require('./config');
+
 const line = require('@line/bot-sdk');
 const express = require('express');
-const config = {
-    "port" : "3000",
-    "channelAccessToken": process.env.LINE_ACCESS_TOKEN,
-    "channelSecret":  process.env.LINE_CHANNEL_SECRET,
-  };
+
 // create LINE SDK client
 const client = new line.Client(config);
 
@@ -18,7 +16,7 @@ app.post('/webhook', line.middleware(config), (req, res) => {
   if (!Array.isArray(req.body.events)) {
     return res.status(500).end();
   }
-  // handle events separately
+  // handle events separatelys
   Promise.all(req.body.events.map(event => {
     console.log('event', event);
     // check verify webhook event
