@@ -19,7 +19,9 @@
   "homepage": "https://github.com/nppi3enz/my-divider#readme",
   "dependencies": {
     "@line/bot-sdk": "^6.6.0",
+    "body-parser": "^1.18.3",
     "dotenv": "^7.0.0",
-    "express": "^4.16.4"
+    "express": "^4.16.4",
+    "request": "^2.88.0"
   }
 }

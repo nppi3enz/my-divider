@@ -5,115 +5,123 @@ const config = require('./config');
 const line = require('@line/bot-sdk');
 const express = require('express');
 
+const bodyParser = require('body-parser');
+
 // create LINE SDK client
 const client = new line.Client(config);
 
 const app = express();
 
-// webhook callback
-app.post('/webhook', line.middleware(config), (req, res) => {
-  // req.body.events should be an array of events
-  if (!Array.isArray(req.body.events)) {
-    return res.status(500).end();
-  }
-  // handle events separatelys
-  Promise.all(req.body.events.map(event => {
-    console.log('event', event);
-    // check verify webhook event
-    if (event.replyToken === '00000000000000000000000000000000' ||
-      event.replyToken === 'ffffffffffffffffffffffffffffffff') {
-      return;
-    }
-    return handleEvent(event);
-  }))
-    .then(() => res.end())
-    .catch((err) => {
-      console.error(err);
-      res.status(500).end();
-    });
-});
+express()
+    .use(bodyParser.json())
+    .use(bodyParser.urlencoded({ extended: false}))
+    .get('/', (req, res) => res.send(`Hi there! This is a nodejs-line-api running on PORT: ${ config.port }`))
+    .listen(config.port, () => console.log(`Listening on ${ config.port }`));
 
-// simple reply function
-const replyText = (token, texts) => {
-  texts = Array.isArray(texts) ? texts : [texts];
-  return client.replyMessage(
-    token,
-    texts.map((text) => ({ type: 'text', text }))
-  );
-};
+// // webhook callback
+// app.post('/webhook', line.middleware(config), (req, res) => {
+//   // req.body.events should be an array of events
+//   if (!Array.isArray(req.body.events)) {
+//     return res.status(500).end();
+//   }
+//   // handle events separatelys
+//   Promise.all(req.body.events.map(event => {
+//     console.log('event', event);
+//     // check verify webhook event
+//     if (event.replyToken === '00000000000000000000000000000000' ||
+//       event.replyToken === 'ffffffffffffffffffffffffffffffff') {
+//       return;
+//     }
+//     return handleEvent(event);
+//   }))
+//     .then(() => res.end())
+//     .catch((err) => {
+//       console.error(err);
+//       res.status(500).end();
+//     });
+// });
 
-// callback function to handle a single event
-function handleEvent(event) {
-  switch (event.type) {
-    case 'message':
-      const message = event.message;
-      switch (message.type) {
-        case 'text':
-          return handleText(message, event.replyToken);
-        case 'image':
-          return handleImage(message, event.replyToken);
-        case 'video':
-          return handleVideo(message, event.replyToken);
-        case 'audio':
-          return handleAudio(message, event.replyToken);
-        case 'location':
-          return handleLocation(message, event.replyToken);
-        case 'sticker':
-          return handleSticker(message, event.replyToken);
-        default:
-          throw new Error(`Unknown message: ${JSON.stringify(message)}`);
-      }
+// // simple reply function
+// const replyText = (token, texts) => {
+//   texts = Array.isArray(texts) ? texts : [texts];
+//   return client.replyMessage(
+//     token,
+//     texts.map((text) => ({ type: 'text', text }))
+//   );
+// };
 
-    case 'follow':
-      return replyText(event.replyToken, 'Got followed event');
+// // callback function to handle a single event
+// function handleEvent(event) {
+//   switch (event.type) {
+//     case 'message':
+//       const message = event.message;
+//       switch (message.type) {
+//         case 'text':
+//           return handleText(message, event.replyToken);
+//         case 'image':
+//           return handleImage(message, event.replyToken);
+//         case 'video':
+//           return handleVideo(message, event.replyToken);
+//         case 'audio':
+//           return handleAudio(message, event.replyToken);
+//         case 'location':
+//           return handleLocation(message, event.replyToken);
+//         case 'sticker':
+//           return handleSticker(message, event.replyToken);
+//         default:
+//           throw new Error(`Unknown message: ${JSON.stringify(message)}`);
+//       }
 
-    case 'unfollow':
-      return console.log(`Unfollowed this bot: ${JSON.stringify(event)}`);
+//     case 'follow':
+//       return replyText(event.replyToken, 'Got followed event');
 
-    case 'join':
-      return replyText(event.replyToken, `Joined ${event.source.type}`);
+//     case 'unfollow':
+//       return console.log(`Unfollowed this bot: ${JSON.stringify(event)}`);
 
-    case 'leave':
-      return console.log(`Left: ${JSON.stringify(event)}`);
+//     case 'join':
+//       return replyText(event.replyToken, `Joined ${event.source.type}`);
 
-    case 'postback':
-      let data = event.postback.data;
-      return replyText(event.replyToken, `Got postback: ${data}`);
+//     case 'leave':
+//       return console.log(`Left: ${JSON.stringify(event)}`);
 
-    case 'beacon':
-      const dm = `${Buffer.from(event.beacon.dm || '', 'hex').toString('utf8')}`;
-      return replyText(event.replyToken, `${event.beacon.type} beacon hwid : ${event.beacon.hwid} with device message = ${dm}`);
+//     case 'postback':
+//       let data = event.postback.data;
+//       return replyText(event.replyToken, `Got postback: ${data}`);
 
-    default:
-      throw new Error(`Unknown event: ${JSON.stringify(event)}`);
-  }
-}
+//     case 'beacon':
+//       const dm = `${Buffer.from(event.beacon.dm || '', 'hex').toString('utf8')}`;
+//       return replyText(event.replyToken, `${event.beacon.type} beacon hwid : ${event.beacon.hwid} with device message = ${dm}`);
 
-function handleText(message, replyToken) {
-  return replyText(replyToken, message.text);
-}
+//     default:
+//       throw new Error(`Unknown event: ${JSON.stringify(event)}`);
+//   }
+// }
 
-function handleImage(message, replyToken) {
-  return replyText(replyToken, 'Got Image');
-}
+// function handleText(message, replyToken) {
+//   return replyText(replyToken, message.text);
+// }
 
-function handleVideo(message, replyToken) {
-  return replyText(replyToken, 'Got Video');
-}
+// function handleImage(message, replyToken) {
+//   return replyText(replyToken, 'Got Image');
+// }
 
-function handleAudio(message, replyToken) {
-  return replyText(replyToken, 'Got Audio');
-}
+// function handleVideo(message, replyToken) {
+//   return replyText(replyToken, 'Got Video');
+// }
 
-function handleLocation(message, replyToken) {
-  return replyText(replyToken, 'Got Location');
-}
+// function handleAudio(message, replyToken) {
+//   return replyText(replyToken, 'Got Audio');
+// }
 
-function handleSticker(message, replyToken) {
-  return replyText(replyToken, 'Got Sticker');
-}
+// function handleLocation(message, replyToken) {
+//   return replyText(replyToken, 'Got Location');
+// }
 
-const port = config.port;
-app.listen(port, () => {
-  console.log(`listening on ${port}`);
-});
+// function handleSticker(message, replyToken) {
+//   return replyText(replyToken, 'Got Sticker');
+// }
+
+// const port = config.port;
+// app.listen(port, () => {
+//   console.log(`listening on ${port}`);
+// });
